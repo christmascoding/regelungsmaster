@@ -20,12 +20,16 @@ w = np.logspace(-2, 2, 1000)
 def parse_complex_list(s):
     s = s.replace(" ", "")
     result = []
+    if not s:
+        return result  # leere Liste bei leerem Feld
     for part in s.split(","):
-        try:
-            result.append(complex(part))
-        except ValueError:
-            result.append(float(part))  # Fallback
+        if part:  # nur wenn part nicht leer ist
+            try:
+                result.append(complex(part))
+            except ValueError:
+                result.append(float(part))  # Fallback
     return result
+
 
 # Ersatz für tf(signal.zpk2tf(...))
 
