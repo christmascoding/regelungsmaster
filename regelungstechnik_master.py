@@ -82,8 +82,8 @@ st.sidebar.markdown("---")
 st.sidebar.header("Lead/Lag-Element")
 lead_lag_enable = st.sidebar.checkbox("Aktivieren")
 if lead_lag_enable:
-    z = st.sidebar.slider("z (Lead-Nullstelle, 1/z = Position)", 0.1, 10.0, 1.0)
-    p = st.sidebar.slider("p (Lead-Pol, 1/p = Position)", 0.1, 10.0, 2.0)
+    z = st.sidebar.slider("z (Lead-Nullstelle, 1/z = Position)", -10.0, 10.0, 1.0)
+    p = st.sidebar.slider("p (Lead-Pol, 1/p = Position)", -10.0, 10.0, 2.0)
     leadlag = tf([z, 1], [p, 1])
     
     st.sidebar.latex(r"\text{Lead/Lag: } \frac{1 + z s}{1 + p s}")
