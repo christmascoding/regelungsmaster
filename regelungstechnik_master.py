@@ -160,9 +160,27 @@ with col4:
         lead_pole = -1 / p
         ax.plot(np.real(lead_zero), np.imag(lead_zero), 'bo', label='Lead-Nullstelle')
         ax.plot(np.real(lead_pole), np.imag(lead_pole), 'rx', label='Lead-Pol')
-        ax.legend(fontsize=6)
+
+    # Wurzelschwerpunkt berechnen und einzeichnen
+    # Nullstellen und Pole des offenen Regelkreises (open_loop)
+    zeros_ol = open_loop.zeros()
+    poles_ol = open_loop.poles()
+
+    # Anzahl Pole und Nullstellen
+    n_poles = len(poles_ol)
+    n_zeros = len(zeros_ol)
+
+    # Falls n_poles != n_zeros (sonst Division durch 0 vermeiden)
+    if n_poles != n_zeros:
+        sum_poles = np.sum(poles_ol)
+        sum_zeros = np.sum(zeros_ol)
+        ws = (sum_poles - sum_zeros) / (n_poles - n_zeros)
+        ax.plot(np.real(ws), np.imag(ws), 'md', markersize=10, label='Wurzelschwerpunkt')
+
+    ax.legend(fontsize=6)
 
     st.pyplot(fig)
+
 
 
 # ---- Stabilitätsinfo ---- #
