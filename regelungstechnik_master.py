@@ -122,20 +122,72 @@ with col1:
     st.pyplot(fig)
 
 # Bode-Diagramm
+# Bode-Diagramm mit erweiterten Features
 with col2:
     st.markdown("**Bode-Diagramm**")
     mag, phase, omega = bode_plot(open_loop, w, plot=False)
+    phase_deg = np.degrees(phase)
+    gain_db = 20 * np.log10(mag)
+
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(3, 2), tight_layout=True)
-    ax1.semilogx(omega, 20 * np.log10(mag))
+
+    # Amplitudenplot
+    ax1.semilogx(omega, gain_db)
     ax1.set_ylabel("dB", fontsize=7)
     ax1.tick_params(labelsize=6)
     ax1.grid(True)
-    ax2.semilogx(omega, np.degrees(phase))
+
+    # Phasenplot
+    ax2.semilogx(omega, phase_deg)
     ax2.set_ylabel("°", fontsize=7)
     ax2.set_xlabel("ω", fontsize=7)
     ax2.tick_params(labelsize=6)
     ax2.grid(True)
+
+    padding = 10
+    # Grenzen des Phasenbereichs (auf nächste 45° runden)
+    def round_down_45(x):
+        return 45 * np.floor((x - padding) / 45)
+    def round_up_45(x):
+        return 45 * np.ceil((x + padding) / 45)
+
+    phase_min = np.nanmin(phase_deg)
+    phase_max = np.nanmax(phase_deg)
+    ymin = round_down_45(phase_min)
+    ymax = round_up_45(phase_max)
+    ax2.set_ylim(ymin, ymax)
+
+    # horizontale Linien alle 45°
+    yticks = np.arange(ymin, ymax + 1, 45)
+    ax2.set_yticks(yticks)
+    for y in yticks:
+        ax2.axhline(y, color='gray', linestyle='--', linewidth=0.4)
+
+    # Schnittpunkte mit 45°-Linien markieren
+    for target_phase in yticks:
+        for i in range(len(phase_deg) - 1):
+            p1, p2 = phase_deg[i], phase_deg[i + 1]
+            if (p1 - target_phase) * (p2 - target_phase) < 0:
+                w1, w2 = omega[i], omega[i + 1]
+                alpha = (target_phase - p1) / (p2 - p1)
+                w_cross = w1 + alpha * (w2 - w1)
+                ax2.hlines(target_phase, w_cross * 0.98, w_cross * 1.02, colors='black', linewidth=1)
+
+    # Quartalsbeschriftung – nur einmal pro Quartal
+    quartal_labels = {
+        "Q1": 45,
+        "Q2": 135,
+        "Q3": -135,
+        "Q4": -45
+    }
+    x_middle = omega[len(omega) // 2]
+    for q, phi in quartal_labels.items():
+        if ymin <= phi <= ymax:
+            ax2.text(x_middle, phi, q, fontsize=6, color='darkred', ha='center', va='center', rotation=0)
+
+
     st.pyplot(fig)
+
 
 # Nyquist
 with col3:
